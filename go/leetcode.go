@@ -15,7 +15,3 @@ func mergeAlternately(word1 string, word2 string) string {
 	}
 	return string(retByte)
 }
-
-func gcdOfStrings(str1 string, str2 string) string {
-	return ""
-}
