@@ -65,3 +65,39 @@ func reverseWords(s string) string {
 
 	return string(words)
 }
+
+// 238
+/*
+xxxxx
+12345
+
+     4
+xxxx xxxx
+2345 1345
+
+*/
+func productExceptSelf(nums []int) []int {
+	lenght := len(nums)
+	convertedNums := []int{}
+	for i := 0; i < lenght; i++ {
+		convertedNums = append(convertedNums, nums[:i]...)   // elements before i
+		convertedNums = append(convertedNums, nums[i+1:]...) // elements after i
+	}
+
+	nums = []int{}
+	multiply := 1
+	for i := 0; i < len(convertedNums); i++ {
+		if i%lenght-1 != 0 {
+			multiply = multiply * convertedNums[i]
+			continue
+		}
+
+		nums = append(nums, multiply)
+		multiply = 1
+	}
+
+	return nums
+}
+func main() {
+	productExceptSelf([]int{1, 2, 3, 4})
+}
