@@ -1,4 +1,6 @@
-package _go
+package main
+
+import "fmt"
 
 func mergeAlternately(word1 string, word2 string) string {
 	var retByte []byte
@@ -71,33 +73,61 @@ func reverseWords(s string) string {
 xxxxx
 12345
 
-     4
+1    5    ... 20
 xxxx xxxx
 2345 1345
 
+{
+	1:total
+	2:total
+	3:total
+}
 */
-func productExceptSelf(nums []int) []int {
-	lenght := len(nums)
-	convertedNums := []int{}
-	for i := 0; i < lenght; i++ {
-		convertedNums = append(convertedNums, nums[:i]...)   // elements before i
-		convertedNums = append(convertedNums, nums[i+1:]...) // elements after i
-	}
+// TODO
+/*
+			1st loop 	 {
+					1:total
+					2:total
+					3:total
+				}
+	2nd loop left sum
+		3nd loop right sum
+*/
 
-	nums = []int{}
-	multiply := 1
-	for i := 0; i < len(convertedNums); i++ {
-		if i%lenght-1 != 0 {
-			multiply = multiply * convertedNums[i]
+func productExceptSelf(nums []int) []int {
+	mapNums := map[int]int{}
+	uniqueNums := []int{}
+	for i := 1; i < len(nums); i++ {
+		_, ok := mapNums[i]
+		if !ok {
+			mapNums[nums[i]] = 1
+			uniqueNums = append(uniqueNums, nums[i])
 			continue
 		}
+		mapNums[i]++
+	}
+	rightSumNums := make([]int, len(uniqueNums))
+	rightSumNums[len(uniqueNums)-1] = 1
+	for i := len(uniqueNums) - 2; i >= 0; i-- {
+		value := uniqueNums[i+1]
+		count := mapNums[uniqueNums[i+1]]
+		rightSumNums[i] = rightSumNums[i+1] * count * value
+	}
+	leftSumNums := make([]int, len(uniqueNums))
+	leftSumNums[0] = 1
+	for i := 1; i < len(uniqueNums); i++ {
+		leftSumNums[i] = leftSumNums[i-1] * mapNums[uniqueNums[i-1]] * uniqueNums[i-1]
+	}
 
-		nums = append(nums, multiply)
-		multiply = 1
+	for i := 0; i < len(nums); i++ {
+		value := nums[i]
+		count := mapNums[nums[i]]
+		nums[i] = value * (count - 1) * leftSumNums[i] * rightSumNums[i]
 	}
 
 	return nums
 }
 func main() {
-	productExceptSelf([]int{1, 2, 3, 4})
+	a := productExceptSelf([]int{1, 2, 3, 4})
+	fmt.Print(a)
 }
