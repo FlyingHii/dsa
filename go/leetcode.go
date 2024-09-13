@@ -89,6 +89,7 @@ xxxx xxxx
 					1:total
 					2:total
 					3:total
+					4:total
 				}
 	2nd loop left sum
 		3nd loop right sum
@@ -97,37 +98,58 @@ xxxx xxxx
 func productExceptSelf(nums []int) []int {
 	mapNums := map[int]int{}
 	uniqueNums := []int{}
-	for i := 1; i < len(nums); i++ {
-		_, ok := mapNums[i]
+	for i := 0; i < len(nums); i++ {
+		_, ok := mapNums[nums[i]]
 		if !ok {
 			mapNums[nums[i]] = 1
 			uniqueNums = append(uniqueNums, nums[i])
 			continue
 		}
-		mapNums[i]++
+		mapNums[nums[i]]++
 	}
-	rightSumNums := make([]int, len(uniqueNums))
-	rightSumNums[len(uniqueNums)-1] = 1
+
+	rightSumNums := make(map[int]int, len(uniqueNums))
+	rightestUniqueNums := uniqueNums[len(uniqueNums)-1]
+	rightSumNums[rightestUniqueNums] = 1
 	for i := len(uniqueNums) - 2; i >= 0; i-- {
-		value := uniqueNums[i+1]
-		count := mapNums[uniqueNums[i+1]]
-		rightSumNums[i] = rightSumNums[i+1] * count * value
+		// si = ni-1 * ni-1-1 *...
+		// si = ni-1 * ni-1-1 *...
+		// si = ni-1 * si-1
+		curVal := uniqueNums[i]
+		lastVal := uniqueNums[i+1]
+		lastCnt := mapNums[lastVal]
+		lastSum := rightSumNums[lastVal]
+		rightSumNums[curVal] = lastCnt * lastVal * lastSum
 	}
-	leftSumNums := make([]int, len(uniqueNums))
-	leftSumNums[0] = 1
+	leftSumNums := make(map[int]int, len(uniqueNums))
+	leftestUniqueNums := uniqueNums[0]
+	leftSumNums[leftestUniqueNums] = 1
 	for i := 1; i < len(uniqueNums); i++ {
-		leftSumNums[i] = leftSumNums[i-1] * mapNums[uniqueNums[i-1]] * uniqueNums[i-1]
+		// si = ni-1 * ni-1-1 *...
+		// si = ni-1 * ni-1-1 *...
+		// si = ni-1 * si-1
+		curVal := uniqueNums[i]
+		lastVal := uniqueNums[i-1]
+		lastCnt := mapNums[lastVal]
+		lastSum := leftSumNums[lastVal]
+		leftSumNums[curVal] = lastSum * lastCnt * lastVal
 	}
 
 	for i := 0; i < len(nums); i++ {
 		value := nums[i]
-		count := mapNums[nums[i]]
-		nums[i] = value * (count - 1) * leftSumNums[i] * rightSumNums[i]
+		count := mapNums[value]
+
+		if count > 1 {
+			nums[i] = value * (count - 1) * leftSumNums[value] * rightSumNums[value]
+			continue
+		}
+		nums[i] = leftSumNums[value] * rightSumNums[value]
 	}
 
 	return nums
 }
 func main() {
-	a := productExceptSelf([]int{1, 2, 3, 4})
+
+	a := productExceptSelf([]int{5, 9, 2, -9, -9, -7, -8, 7, -9, 10})
 	fmt.Print(a)
 }
