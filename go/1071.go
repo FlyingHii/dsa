@@ -1,4 +1,4 @@
-package _go
+package main
 
 // based on the fact that for two strings str1 and str2, the largest common divisor string can only exist if both str1 + str2 == str2 + str1
 func gcd(a, b int) int {

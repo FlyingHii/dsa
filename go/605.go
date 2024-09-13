@@ -1,4 +1,4 @@
-package _go
+package main
 
 func canPlaceFlowers(flowerbed []int, n int) bool {
 	var (

@@ -189,11 +189,62 @@ func productExceptSelf_online(nums []int) []int {
 	}
 	return ans
 }
+
+// 334
+func increasingTriplet_naive(nums []int) bool {
+
+	for i := len(nums) - 1; i >= 0; i-- {
+		for i2 := len(nums) - 1; i2 >= i; i2-- {
+			for i3 := len(nums) - 1; i3 >= i; i3-- {
+				/*
+					if nums[i] < nums[i2] < nums[i3] {
+						return true
+					}
+				*/
+			}
+		}
+	}
+
+	return false
+}
+
+// failed - solution
+func increasingTriplet(nums []int) bool {
+	if len(nums) < 3 {
+		return false
+	}
+	retStage1 := false
+	seco := nums[len(nums)-2]
+	maxSeco := nums[len(nums)-2]
+	thir := nums[len(nums)-1]
+	for i := len(nums) - 3; i >= 0; i-- {
+		if seco < thir {
+			if maxSeco > seco {
+				maxSeco = seco
+			}
+			retStage1 = true
+		}
+		if nums[i] < maxSeco && retStage1 {
+			return true
+		}
+		if seco > thir {
+			thir = seco
+		}
+		if nums[i] > seco {
+			seco = nums[i]
+		}
+	}
+	return false
+}
+
+// main
 func main() {
 	memBefore := getMemStats()
 	start := time.Now()
 
-	a := productExceptSelf([]int{5, 9, 2, -9, -9, -7, -8, 7, -9, 10})
+	a := increasingTriplet([]int{4, 5, 2147483647, 1, 2})
+
+	println(a)
 
 	elapsed := time.Since(start)
 	// Capture memory stats after the function call
@@ -203,20 +254,6 @@ func main() {
 	fmt.Printf("Function took %s\n", elapsed)
 	fmt.Printf("Memory used by function: %v bytes\n", memAfter.Alloc-memBefore.Alloc)
 	fmt.Println("------ End Algo Statistic ----------")
-	b := []int{-51438240, -28576800, -128595600, 28576800, 28576800, 36741600, 32148900, -36741600, 28576800, -25719120}
-	fmt.Println(a)
-	fmt.Println(slicesEqual(a, b))
-}
-func slicesEqual(a, b []int) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
 }
 func getMemStats() runtime.MemStats {
 	var m runtime.MemStats

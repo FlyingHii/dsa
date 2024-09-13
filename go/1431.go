@@ -1,4 +1,4 @@
-package _go
+package main
 
 func kidsWithCandies(candies []int, extraCandies int) (ret []bool) {
 	// Step 1: Find the current maximum number of candies any kid has
