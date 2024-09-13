@@ -1,6 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+	"runtime"
+	"time"
+)
 
 func mergeAlternately(word1 string, word2 string) string {
 	var retByte []byte
@@ -119,7 +124,7 @@ func productExceptSelf(nums []int) []int {
 		lastVal := uniqueNums[i+1]
 		lastCnt := mapNums[lastVal]
 		lastSum := rightSumNums[lastVal]
-		rightSumNums[curVal] = lastCnt * lastVal * lastSum
+		rightSumNums[curVal] = int(math.Pow(float64(lastVal), float64(lastCnt))) * lastSum
 	}
 	leftSumNums := make(map[int]int, len(uniqueNums))
 	leftestUniqueNums := uniqueNums[0]
@@ -132,24 +137,89 @@ func productExceptSelf(nums []int) []int {
 		lastVal := uniqueNums[i-1]
 		lastCnt := mapNums[lastVal]
 		lastSum := leftSumNums[lastVal]
-		leftSumNums[curVal] = lastSum * lastCnt * lastVal
+		leftSumNums[curVal] = lastSum * int(math.Pow(float64(lastVal), float64(lastCnt)))
 	}
 
 	for i := 0; i < len(nums); i++ {
 		value := nums[i]
 		count := mapNums[value]
-
-		if count > 1 {
-			nums[i] = value * (count - 1) * leftSumNums[value] * rightSumNums[value]
-			continue
-		}
-		nums[i] = leftSumNums[value] * rightSumNums[value]
+		nums[i] = int(math.Pow(float64(value), float64(count-1))) * leftSumNums[value] * rightSumNums[value]
 	}
 
 	return nums
 }
+func productExceptSelf_AI(nums []int) []int {
+	length := len(nums)
+	result := make([]int, length)
+
+	// Initialize result array with 1
+	for i := range result {
+		result[i] = 1
+	}
+
+	// Calculate left products
+	leftProd := 1
+	for i := 0; i < length; i++ {
+		result[i] = leftProd
+		leftProd *= nums[i]
+	}
+
+	// Calculate right products and finalize result
+	rightProd := 1
+	for i := length - 1; i >= 0; i-- {
+		result[i] *= rightProd
+		rightProd *= nums[i]
+	}
+
+	return result
+}
+
+// https://github.com/doocs/leetcode/blob/main/solution/0200-0299/0238.Product%20of%20Array%20Except%20Self/README_EN.md
+func productExceptSelf_online(nums []int) []int {
+	n := len(nums)
+	ans := make([]int, n)
+	left, right := 1, 1
+	for i, x := range nums {
+		ans[i] = left
+		left *= x
+	}
+	for i := n - 1; i >= 0; i-- {
+		ans[i] *= right
+		right *= nums[i]
+	}
+	return ans
+}
 func main() {
+	memBefore := getMemStats()
+	start := time.Now()
 
 	a := productExceptSelf([]int{5, 9, 2, -9, -9, -7, -8, 7, -9, 10})
-	fmt.Print(a)
+
+	elapsed := time.Since(start)
+	// Capture memory stats after the function call
+	memAfter := getMemStats()
+
+	fmt.Println("------ Algo Statistic ----------")
+	fmt.Printf("Function took %s\n", elapsed)
+	fmt.Printf("Memory used by function: %v bytes\n", memAfter.Alloc-memBefore.Alloc)
+	fmt.Println("------ End Algo Statistic ----------")
+	b := []int{-51438240, -28576800, -128595600, 28576800, 28576800, 36741600, 32148900, -36741600, 28576800, -25719120}
+	fmt.Println(a)
+	fmt.Println(slicesEqual(a, b))
+}
+func slicesEqual(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+func getMemStats() runtime.MemStats {
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	return m
 }
