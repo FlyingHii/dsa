@@ -209,32 +209,67 @@ func increasingTriplet_naive(nums []int) bool {
 }
 
 // failed - solution
-func increasingTriplet(nums []int) bool {
+func increasingTripletFailed(nums []int) bool {
 	if len(nums) < 3 {
 		return false
 	}
-	retStage1 := false
-	seco := nums[len(nums)-2]
-	maxSeco := nums[len(nums)-2]
-	thir := nums[len(nums)-1]
-	for i := len(nums) - 3; i >= 0; i-- {
-		if seco < thir {
-			if maxSeco > seco {
-				maxSeco = seco
-			}
-			retStage1 = true
-		}
-		if nums[i] < maxSeco && retStage1 {
+	lenNums := len(nums)
+	maxRightITh := nums[lenNums-1] // max(nums[i2-1:])
+	maxRightISe := nums[lenNums-2] // max(nums[i-1:])
+	iMaxRightITh := lenNums - 1
+	iMaxRightISe := lenNums - 2
+	// iMaxRightISe < iMaxRightITh
+	for i := lenNums - 3; i >= 0; i-- {
+		if nums[i] < maxRightISe && maxRightISe < maxRightITh && iMaxRightISe < iMaxRightITh {
 			return true
 		}
-		if seco > thir {
-			thir = seco
-		}
-		if nums[i] > seco {
-			seco = nums[i]
+
+		switch {
+		case maxRightISe > maxRightITh:
+			maxRightITh = maxRightISe
+			iMaxRightITh = iMaxRightISe
+			maxRightISe = nums[i]
+			iMaxRightISe = i
+			continue
+		case nums[i] > maxRightISe:
+			maxRightISe = nums[i]
+			iMaxRightISe = i
+			continue
+		case iMaxRightISe >= iMaxRightITh, maxRightISe == maxRightITh, nums[i] == maxRightISe:
+			continue
 		}
 	}
+
 	return false
+}
+
+// greedy approach:
+// why: no-backtracking, local optimal (first & second)
+/*
+mi and mid serve as placeholders to store the smallest and middle elements of the potential increasing triplet subsequence. By initializing them to infinity, it ensures that any number in the array will be smaller, allowing for proper updating of these variables.
+The main algorithm unfolds within a single pass through the array of numbers (nums):
+
+A for loop iterates through the nums array. For each num in nums, there is a series of checks and updates:
+	if num > mid: This is the condition that tells us we have found a valid triplet. If the current num is greater than our mid value, then we already have a mi which is less than mid, and hence, we have found a sequence where mi < mid < num. We return True immediately.
+	if num <= mi: If the current num is smaller than or equal to the current smallest value mi, it means that we can potentially start a new triplet sequence with this num as the smallest element, thus we update mi with the value of num.
+	else: If the current num is greater than mi and not greater than mid, it fits between the mi and mid, so we update the mid to be num since it could potentially be the middle element of a valid triplet.
+It's important to note that the code uses a greedy approach to always maintain the smallest possible values for mi and mid as it iterates over nums.
+By consistently updating these with the smallest possible values at each step, it optimizes the chance of finding a valid triplet later in the array.
+*/
+func increasingTriplet_AI(nums []int) bool {
+	first, second := int(^uint(0)>>1), int(^uint(0)>>1) // max int value
+
+	for _, num := range nums {
+		if num <= first {
+			first = num // update first if num is smaller
+		} else if num <= second {
+			second = num // update second if num is between first and second
+		} else {
+			return true // found a number greater than both first and second
+		}
+	}
+
+	return false // no valid triplet found
 }
 
 // main
