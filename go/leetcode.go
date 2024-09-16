@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"runtime"
+	"sort"
+	"strings"
 	"time"
 )
 
@@ -273,6 +275,46 @@ func increasingTriplet_AI(nums []int) bool {
 }
 
 // main
+
+// 49
+func getRuneCountKey(s string) string {
+	// Create a map to count the frequency of each rune
+	runeCount := make(map[rune]int)
+	for _, r := range s {
+		runeCount[r]++
+	}
+
+	// To ensure the order doesn't matter, create a sorted string key
+	var sortedRuneCount []string
+	for r, count := range runeCount {
+		sortedRuneCount = append(sortedRuneCount, fmt.Sprintf("%c:%d", r, count))
+	}
+
+	sort.Strings(sortedRuneCount) // Sort the key for consistency
+	return strings.Join(sortedRuneCount, ",")
+}
+
+func groupAnagrams(strs []string) [][]string {
+	showed := make(map[string][]string) // map to store anagram groups
+
+	for _, value := range strs {
+		// Get the "runes & count" key for the current string
+		// TODO: no need to use "runes&count" as key => "sortedRunes" as key instead (a is anagrams of b => sortedA == sortedB)
+		key := getRuneCountKey(value)
+
+		// Add the string to the group corresponding to its "rune & count" key
+		showed[key] = append(showed[key], value)
+	}
+
+	// Collect all the anagram groups
+	var group [][]string
+	for _, anagrams := range showed {
+		group = append(group, anagrams)
+	}
+
+	return group
+}
+
 func main() {
 	memBefore := getMemStats()
 	start := time.Now()
