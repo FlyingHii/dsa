@@ -315,6 +315,108 @@ func groupAnagrams(strs []string) [][]string {
 	return group
 }
 
+/*
+36. Valid Sudoku
+Medium
+Topics
+Companies
+Determine if a 9 x 9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
+
+Each row must contain the digits 1-9 without repetition.
+Each column must contain the digits 1-9 without repetition.
+Each of the nine 3 x 3 sub-boxes of the grid must contain the digits 1-9 without repetition.
+Note:
+
+A Sudoku board (partially filled) could be valid but is not necessarily solvable.
+Only the filled cells need to be validated according to the mentioned rules.
+
+Example 1:
+
+Input: board =
+[["5","3",".",".","7",".",".",".","."]
+,["6",".",".","1","9","5",".",".","."]
+,[".","9","8",".",".",".",".","6","."]
+,["8",".",".",".","6",".",".",".","3"]
+,["4",".",".","8",".","3",".",".","1"]
+,["7",".",".",".","2",".",".",".","6"]
+,[".","6",".",".",".",".","2","8","."]
+,[".",".",".","4","1","9",".",".","5"]
+,[".",".",".",".","8",".",".","7","9"]]
+Output: true
+Example 2:
+
+Input: board =
+[["8","3",".",".","7",".",".",".","."]
+,["6",".",".","1","9","5",".",".","."]
+,[".","9","8",".",".",".",".","6","."]
+,["8",".",".",".","6",".",".",".","3"]
+,["4",".",".","8",".","3",".",".","1"]
+,["7",".",".",".","2",".",".",".","6"]
+,[".","6",".",".",".",".","2","8","."]
+,[".",".",".","4","1","9",".",".","5"]
+,[".",".",".",".","8",".",".","7","9"]]
+Output: false
+Explanation: Same as Example 1, except with the 5 in the top left corner being modified to 8. Since there are two 8's in the top left 3x3 sub-box, it is invalid.
+
+Constraints:
+
+board.length == 9
+board[i].length == 9
+board[i][j] is a digit 1-9 or '.'.
+----------
+*/
+func check19_without_repetition(cellValues [9]byte) bool {
+	cellValuesSet := map[byte]bool{}
+	for _, cellValue := range cellValues {
+		if cellValue == '.' {
+			continue
+		}
+		if cellValuesSet[cellValue] == true {
+			return false
+		}
+		cellValuesSet[cellValue] = true
+	}
+	return true
+}
+
+func isValidSudoku(board [][]byte) bool {
+	//Each row must contain the digits 1-9 without repetition.
+	//Each column must contain the digits 1-9 without repetition.
+	//Each of the nine 3 x 3 sub-boxes of the grid must contain the digits 1-9 without repetition.
+
+	for i := 0; i < 9; i++ {
+		var row [9]byte // Array of 9 bytes
+		copy(row[:], board[i])
+		if check19_without_repetition(row) == false {
+			return false
+		}
+
+		col := [9]byte{}
+		for colIdx := 0; colIdx < 9; colIdx++ {
+			col[i] = board[colIdx][i]
+		}
+		if check19_without_repetition(col) == false {
+			return false
+		}
+
+		//x33sIJ := [9][2]byte{{0, 0}, {3, 0}, {6, 0}, {0, 3}, {3, 3}, {6, 3}, {0, 6}, {3, 6}, {6, 6}}
+		//x33 := [9]byte{}
+		//for colIdx := 0; colIdx < 9; colIdx++ {
+		//	// TODO
+		//	col[i] = board[colIdx][i]
+		//}
+		//
+		//for _, ij := range x33sIJ {
+		//	// {0,0}, {3,0}, {6,0},{0,3}, {3,3}, {6,3},{0,6}, {3,6}, {6,6}
+		//	x33[i] = board[ij[0]][ij[1]]
+		//}
+		if check19_without_repetition(x33) == false {
+			return false
+		}
+	}
+
+	return true
+}
 func main() {
 	memBefore := getMemStats()
 	start := time.Now()
