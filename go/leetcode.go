@@ -417,6 +417,120 @@ func isValidSudoku(board [][]byte) bool {
 
 	return true
 }
+
+/*
+128. Longest Consecutive Sequence
+Medium
+Topics
+Companies
+Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.
+
+You must write an algorithm that runs in O(n) time.
+
+Example 1:
+
+Input: nums = [100,4,200,1,3,2]
+Output: 4
+Explanation: The longest consecutive elements sequence is [1, 2, 3, 4]. Therefore its length is 4.
+Example 2:
+
+Input: nums = [0,3,7,2,5,8,4,6,0,1]
+Output: 9
+
+Constraints:
+
+0 <= nums.length <= 105
+-109 <= nums[i] <= 109
+
+------------
+*/
+func longestConsecutive(nums []int) int {
+
+	//-----------0
+	// []consecutive int array
+	//rets is [][]int
+
+	//ret is longest among rets
+	//&& for retVal = ret -> if retVal[i] !== retVal[i-1]+1 => isconsecutive = false
+
+	//-----------0.1
+	// convert nums to set map[num]
+	minNum := int(math.Pow(10, 9))
+	numsSet := map[int]bool{}
+	for _, num := range nums {
+		numsSet[num] = true
+		if num < minNum {
+			minNum = num
+		}
+	}
+
+	//build endStartMap with consecutive
+	//-----------0.1
+	// map[end]start
+	//endStartMap:=map[int]int
+	// map[start]end
+	//startEndMap:=map[int]int
+	//for num,_ = range numsSet {//i 0 num 8
+	//-----------0.1
+	//if endStartMap[num] not exist {
+	//  if endStartMap[num-1] not exist {
+	//    endStartMap[num]=num //num or nums[0]??
+	//  } else {
+	//    //increase end
+	//    endStartMap[num]=endStartMap[num-1]
+	//    delete(endStartMap[num-1])
+	//  }
+	//
+	//} else {
+	//  //endStartMap[num]=start
+	//}
+	//}
+
+	//-----------0.2
+	maxStreak := 0
+	streak := 1
+	// stop condition??
+	// 1 2 3 5 6
+	start := minNum
+	end := minNum
+	for i := 1; len(numsSet) != 0; i++ {
+		//end of consequentive, update new max, reset streak, choose new init item
+		if numsSet[end+i] == false && numsSet[start-i] == false {
+			//set new init item
+			for key := range numsSet {
+				start = key
+				end = key
+				break
+			}
+			delete(numsSet, start)
+			streak = 1
+			i = 0
+		}
+
+		//expand right
+		if numsSet[end+i] == true {
+			streak++
+			delete(numsSet, end+i)
+		}
+		//expand left
+		if numsSet[start-i] == true {
+			streak++
+			delete(numsSet, start-i)
+		}
+		if streak > maxStreak {
+			maxStreak = streak
+		}
+	}
+
+	// find ret is longest among endStartMap
+	//maxLength:=0
+	//for end,start = range endStartMap {
+	//	if end-start > maxLength {
+	//		maxLength=length
+	//	}
+	//}
+	return maxStreak
+}
 func main() {
 	memBefore := getMemStats()
 	start := time.Now()
