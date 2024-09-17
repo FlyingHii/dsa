@@ -365,10 +365,11 @@ board[i].length == 9
 board[i][j] is a digit 1-9 or '.'.
 ----------
 */
+//['1','2',...]
 func check19_without_repetition(cellValues [9]byte) bool {
 	cellValuesSet := map[byte]bool{}
 	for _, cellValue := range cellValues {
-		if cellValue == '.' {
+		if cellValue == '.' || cellValue == 0 {
 			continue
 		}
 		if cellValuesSet[cellValue] == true {
@@ -379,11 +380,17 @@ func check19_without_repetition(cellValues [9]byte) bool {
 	return true
 }
 
+func getX33sIJ(location [2]int) [][2]int {
+	ret := make([][2]int, 0, 9)
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
+			ret = append(ret, [2]int{location[0] + i, location[1] + j})
+		}
+	}
+	return ret
+}
 func isValidSudoku(board [][]byte) bool {
-	//Each row must contain the digits 1-9 without repetition.
-	//Each column must contain the digits 1-9 without repetition.
-	//Each of the nine 3 x 3 sub-boxes of the grid must contain the digits 1-9 without repetition.
-
+	x33sStartLoc := [9][2]int{{0, 0}, {3, 0}, {6, 0}, {0, 3}, {3, 3}, {6, 3}, {0, 6}, {3, 6}, {6, 6}}
 	for i := 0; i < 9; i++ {
 		var row [9]byte // Array of 9 bytes
 		copy(row[:], board[i])
@@ -393,23 +400,16 @@ func isValidSudoku(board [][]byte) bool {
 
 		col := [9]byte{}
 		for colIdx := 0; colIdx < 9; colIdx++ {
-			col[i] = board[colIdx][i]
+			col[colIdx] = board[colIdx][i]
 		}
 		if check19_without_repetition(col) == false {
 			return false
 		}
 
-		//x33sIJ := [9][2]byte{{0, 0}, {3, 0}, {6, 0}, {0, 3}, {3, 3}, {6, 3}, {0, 6}, {3, 6}, {6, 6}}
-		//x33 := [9]byte{}
-		//for colIdx := 0; colIdx < 9; colIdx++ {
-		//	// TODO
-		//	col[i] = board[colIdx][i]
-		//}
-		//
-		//for _, ij := range x33sIJ {
-		//	// {0,0}, {3,0}, {6,0},{0,3}, {3,3}, {6,3},{0,6}, {3,6}, {6,6}
-		//	x33[i] = board[ij[0]][ij[1]]
-		//}
+		x33 := [9]byte{}
+		for in, location := range getX33sIJ(x33sStartLoc[i]) {
+			x33[in] = board[location[0]][location[1]]
+		}
 		if check19_without_repetition(x33) == false {
 			return false
 		}
@@ -421,7 +421,18 @@ func main() {
 	memBefore := getMemStats()
 	start := time.Now()
 
-	a := increasingTriplet([]int{4, 5, 2147483647, 1, 2})
+	board := [][]byte{
+		{'.', '.', '.', '.', '5', '.', '.', '1', '.'},
+		{'.', '4', '.', '3', '.', '.', '.', '.', '.'},
+		{'.', '.', '.', '.', '.', '3', '.', '.', '1'},
+		{'8', '.', '.', '.', '.', '.', '.', '2', '.'},
+		{'.', '.', '2', '.', '7', '.', '.', '.', '.'},
+		{'.', '1', '5', '.', '.', '.', '.', '.', '.'},
+		{'.', '.', '.', '.', '.', '2', '.', '.', '.'},
+		{'.', '2', '.', '9', '.', '.', '.', '.', '.'},
+		{'.', '.', '4', '.', '.', '.', '.', '.', '.'},
+	}
+	a := isValidSudoku(board)
 
 	println(a)
 
